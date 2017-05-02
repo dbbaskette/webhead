@@ -1,0 +1,34 @@
+.navbar-brand{
+    font-size: xx-large;
+    color: white !important;
+
+}
+
+.description{
+    background-color: lightgray;
+    text-align: center;
+    font-size: x-large;
+    vertical-align: middle;
+    line-height: 60px;
+}
+
+.minimage{
+    height: 80px;
+}
+
+.flash {
+    background-color: lightblue;
+    font-size: large;
+    padding: 1em;
+}
+
+.text-alert{
+    color: darkgreen;
+    text-decoration: blink;
+}
+
+.btn-upload{
+    padding: 10px 20px 10px 20px;
+    margin-top: 30px;
+
+}

@@ -1,0 +1,149 @@
+<!DOCTYPE html >
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>FunCollector</title>
+    <link href="webjars/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    </link>
+    <link rel="stylesheet" href="/custom.css"/>
+    <script src="webjars/jquery/2.1.4/jquery.min.js"></script>
+    <script src="webjars/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="browse.js"></script>
+
+
+</head>
+<body>
+<div class="navbar navbar-inverse">
+    <div class="container">
+        <div class="navbar-header">
+            <header class="navbar-brand">FunCollector</header>
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle Navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+        </div>
+        <div class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="http://www.poppriceguide.com">Pop Price Guide</a></li>
+                <li><a href="http://www.funko.com">Funko Home Page</a></li>
+            </ul>
+
+
+        </div>
+    </div>
+</div>
+<div class="row description">
+    <div class="col-md-9">
+        This is a demonstration using SpringBoot microservices, RabbitMQ, Google ML Vision API, and Pivotal Cloud Foundry
+    </div>
+    <div class="col-md-3">
+        <img class="img-circle" height="120" src="me.jpg"/>
+
+    </div>
+
+
+</div>
+<div class="container">
+    <div class="row">
+        <h3 th:if="${#vars['flash.message']}" th:text="${#vars['flash.message']}" class="flash"/>
+    </div>
+
+    <div class="row">
+        <h3 th:text="${page.number + 1} + ' of ' + ${page.totalPages}"/>
+        <h4 th:text="${page.size} + ' item(s) per page'"/>
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Image</th>
+                <th>Id</th>
+                <th>Value</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="image : ${page.content}">
+                <td th:text="${image.id}"/>
+                <td th:text="${image.name}"/>
+                <td><a th:href="@{'/images/' + ${image.name} + '/raw'}"><img
+                        th:src="@{'/images/' + ${image.name} + '/raw'}" class="img-thumbnail minimage"/></a></td>
+
+                <td th:text="${image.description}" class="text-alert"/>
+                <td>$ <span th:text="${#numbers.formatDecimal(image.value, 0, 'COMMA', 2, 'POINT')}">10.00</span></td>
+
+
+                <td align="center">
+                    <form th:method="delete" th:action="@{'/images/' + ${image.name}}">
+                        <input type="submit" class="btn-danger" value="Delete"/>
+                    </form>
+
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <ul>
+            <li th:if="${prev}"><a th:href="@{/(size=${prev.pageSize},page=${prev.pageNumber})}">Previous</a></li>
+            <li th:if="${next}"><a th:href="@{/(size=${next.pageSize},page=${next.pageNumber})}">Next</a></li>
+        </ul>
+    </div>
+        <!--<p><input type="file" class="btn-info" name="file" /></p>-->
+        <!--<p><label class="btn btn-default btn-file">-->
+        <!--Browse <input type="file" class="btn-info" style="display: none;" name="file" />-->
+        <!--</label></p>-->
+        <form method="post" enctype="multipart/form-data" action="/images">
+            <div class="row">
+
+            <div class="col-lg-6 col-sm-6 col-12">
+                <h4>Choose Image to Upload</h4>
+                <div class="input-group">
+                    <label class="input-group-btn">
+                        <span class="btn btn-primary">
+                            Browse&hellip; <input type="file" name="file"  class="btn btn-primary" style="display: none;"/>
+                        </span>
+                    </label>
+                    <input type="text" class="form-control" readonly="readonly"/>
+
+                </div>
+            </div>
+            </div>
+            <input type="submit" class="btn btn-success btn-md btn-upload" value="Upload"/>
+
+        </form>
+
+</div>
+
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    (function() {
+        window.require(['webjars/stompjs/2.3.3/lib/stomp', 'webjars/sockjs-client/1.1.0/dist/sockjs'], function(stomp, SockJS) {
+
+            var redrawCurrentPage = function(message) {
+                console.log(message);
+                window.location = /*[[@{/(size=${page.size},page=${page.number})}]]*/'';
+            };
+
+            var socket = SockJS('/imageMessages');
+            var stompClient = Stomp.over(socket);
+            stompClient.connect({/* optional headers */}, function(frame) {
+                //stompClient.subscribe('/topic/newImage', redrawCurrentPage);
+                //stompClient.subscribe('/topic/deleteImage', redrawCurrentPage);
+                stompClient.subscribe('/topic/idImage', redrawCurrentPage);
+
+            });
+        })
+
+    })();
+    /*]]>*/
+</script>
+
+
+
+
+</body>
+</html>

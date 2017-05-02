@@ -1,0 +1,79 @@
+buildscript {
+    ext {
+        springBootVersion = '1.5.2.RELEASE'
+        springCloudConnectorsVersion = '1.2.3.RELEASE'
+
+    }
+    repositories {
+        mavenCentral()
+
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'org.springframework.boot'
+
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    maven {
+        url "http://repository.jspresso.org/maven2/"
+    }
+}
+
+springBoot{
+    executable = true
+}
+
+
+dependencies {
+
+
+    compile('org.springframework.boot:spring-boot-starter-actuator')
+    compile('org.springframework.boot:spring-boot-starter-thymeleaf')
+
+
+    //Persistence
+    compile('org.springframework.boot:spring-boot-starter-data-jpa')
+    runtime('com.h2database:h2')
+
+    // MicroService Communication
+    compile('org.springframework.boot:spring-boot-starter-amqp')
+
+
+    //Image Manipulation
+    compile 'javaxt:javaxt-core:1.7.8'
+
+    //WebSockets for Browser Communication
+    compile('org.springframework.boot:spring-boot-starter-websocket')
+    compile('org.webjars:requirejs:2.2.0')
+    compile('org.webjars.npm:stompjs:2.3.3') {
+        exclude module: 'websocket' // We are using SockJS for websocket functionality
+    }
+    compile('org.webjars.bower:sockjs-client:1.1.0')
+
+
+    // Spring Cloud Connectors
+    //compile "org.springframework.cloud:spring-cloud-core:${springCloudConnectorsVersion}"
+    compile "org.springframework.cloud:spring-cloud-spring-service-connector:${springCloudConnectorsVersion}"
+    compile "org.springframework.cloud:spring-cloud-cloudfoundry-connector:${springCloudConnectorsVersion}"
+
+    compile group: 'org.webjars', name: 'bootstrap', version: '3.3.7'
+    compile 'org.webjars:jquery:2.1.4'
+    testCompile('org.springframework.boot:spring-boot-starter-test')
+
+
+
+
+}
+
+jar {
+    baseName = "webhead"
+    version = "" // omit the version from the war file name
+}
